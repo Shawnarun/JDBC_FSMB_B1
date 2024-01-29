@@ -16,16 +16,19 @@ public class StudentManagmentSystem {
         String user="root";
         String password="123456";
         
-        String sql="SELECT * from student WHERE age=24";
+        String sql="SELECT * from student";
        
-       Connection con=DriverManager.getConnection(url, user, password);
-       Statement st=con.createStatement();
+           Connection con=DriverManager.getConnection(url, user, password);
+           Statement st=con.createStatement();
            ResultSet rs= st.executeQuery(sql);
-       
-           rs.next();
-           String name=rs.getString("name");
-        
-        System.out.println(name);
+      
+           String name="";
+         while(rs.next())
+         {
+          name=rs.getString(2);
+          System.out.println(name);
+         }     
+        con.close();
     }
     
 }
