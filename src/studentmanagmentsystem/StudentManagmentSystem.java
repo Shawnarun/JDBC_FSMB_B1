@@ -3,7 +3,7 @@ import java.sql.*;
 
 public class StudentManagmentSystem {
     public static void main(String[] args) throws Exception{
-     deleteStudent();
+     callGetNameById();
     }
     
     public static Connection dbConnction() throws Exception{
@@ -65,14 +65,52 @@ public class StudentManagmentSystem {
     
     public static void deleteStudent() throws Exception{
             Connection con = dbConnction();
-            int id=8;
-            String sql="DELETE from student WHERE student_id=" + id;
+            int id=6;
+            String sql="DELETE from student WHERE student_id= ? ";
             
-            Statement st=con.createStatement();
-            int row = st.executeUpdate(sql);
-            System.out.println(row);
-            
+            PreparedStatement st=con.prepareStatement(sql);
+            st.setInt(1, id);
+            int row = st.executeUpdate();
+            System.out.println(row); 
     }
     
+    public static void callGetAllStudent() throws Exception{
+        Connection con = dbConnction();
+        //Statement
+        //PreparedStatement
+        //CallableStatement
+        CallableStatement cs =con.prepareCall("{call GetAll()}");
+        ResultSet rs=cs.executeQuery();
+        
+        String name="";
+            while(rs.next())
+            {
+                name=rs.getString(2);
+                System.out.println(name);
+            }
+          
+            
+          
+    }
     
+    public static void callGetById() throws Exception{
+          Connection con = dbConnction();
+          int id=4;
+           CallableStatement cs =con.prepareCall("{call GetByID(?)}");
+           cs.setInt(1, id);
+           ResultSet rs=cs.executeQuery();
+           rs.next();
+           System.out.println(rs.getString(2));
+    }
+    
+      public static void callGetNameById() throws Exception{
+          Connection con = dbConnction();
+          int id=4;
+           CallableStatement cs =con.prepareCall("{call GetNameByID(?,?)}");
+           cs.setInt(1, id);
+           cs.registerOutParameter(2,Types.VARCHAR);
+           cs.executeUpdate();
+         
+           System.out.println(cs.getString(2));
+    }
 }
