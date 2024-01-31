@@ -3,39 +3,38 @@ import java.sql.*;
 
 public class StudentManagmentSystem {
     public static void main(String[] args) throws Exception{
-      insertStudent();
+     deleteStudent();
     }
     
-    
-    public static void getAllStudent() throws Exception{
+    public static Connection dbConnction() throws Exception{
         Class.forName("com.mysql.cj.jdbc.Driver");
         String url= "jdbc:mysql://localhost:3306/devAcademy";
         String user="root";
         String password="123456";
-        
-        String sql="SELECT * from student";
+        Connection con=DriverManager.getConnection(url, user, password);
+        return con;
+    }
+    
+    public static void getAllStudent() throws Exception{
        
-           Connection con=DriverManager.getConnection(url, user, password);
-           Statement st=con.createStatement();
-           ResultSet rs= st.executeQuery(sql);
-      
-           String name="";
-         while(rs.next())
-         {
-          name=rs.getString(2);
-          System.out.println(name);
-         }     
-        con.close();
+        String sql="SELECT * from student";
+        try (Connection con = dbConnction()) {
+            Statement st=con.createStatement();
+            ResultSet rs= st.executeQuery(sql);
+            
+            String name="";
+            while(rs.next())
+            {
+                name=rs.getString(2);
+                System.out.println(name);
+            }
+        }
         
     }
     
     public static void insertStudent() throws Exception {
     
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        String url= "jdbc:mysql://localhost:3306/devAcademy";
-        String user="root";
-        String password="123456";
-        
+
         String name= "Hasika";
         int age =21;
         String department="Engineering";
@@ -46,7 +45,7 @@ public class StudentManagmentSystem {
         
         String sql="INSERT INTO student (name,age,department,district,nic,gender,performance)"
                 + " VALUES (?,?,?,?,?,?,?)";
-        try (Connection con = DriverManager.getConnection(url, user, password)) {
+        try (Connection con = dbConnction()) {
             
             PreparedStatement ps=con.prepareStatement(sql);
                 ps.setString(1, name);
@@ -63,4 +62,17 @@ public class StudentManagmentSystem {
             System.out.println(e);
         }
     }
+    
+    public static void deleteStudent() throws Exception{
+            Connection con = dbConnction();
+            int id=8;
+            String sql="DELETE from student WHERE student_id=" + id;
+            
+            Statement st=con.createStatement();
+            int row = st.executeUpdate(sql);
+            System.out.println(row);
+            
+    }
+    
+    
 }
