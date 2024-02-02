@@ -1,9 +1,11 @@
 package studentmanagmentsystem;
 import java.sql.*;
+import java.util.*; 
+
 
 public class StudentManagmentSystem {
     public static void main(String[] args) throws Exception{
-     commitPractice();
+     batchProcessing();
     }
     
     public static Connection dbConnction() throws Exception{
@@ -132,6 +134,21 @@ public class StudentManagmentSystem {
           System.out.println(a);
           System.out.println(b);
           con.close();
+          
+    }
+    
+    public static void batchProcessing() throws Exception{
+       Connection con = dbConnction();
+          String query ="UPDATE student SET performance= 75 WHERE student_id=1";
+          String query2 ="UPDATE student SET performance= 75 WHERE student_id=2";
+         
+          Statement st= con.createStatement();
+          st.addBatch(query);
+          st.addBatch(query2);
+         
+         int[] a= st.executeBatch();
+         System.out.println(Arrays.toString(a));
+          
           
     }
 }
