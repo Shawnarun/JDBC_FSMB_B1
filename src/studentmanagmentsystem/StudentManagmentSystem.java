@@ -3,7 +3,7 @@ import java.sql.*;
 
 public class StudentManagmentSystem {
     public static void main(String[] args) throws Exception{
-     callGetNameById();
+     commitPractice();
     }
     
     public static Connection dbConnction() throws Exception{
@@ -103,7 +103,7 @@ public class StudentManagmentSystem {
            System.out.println(rs.getString(2));
     }
     
-      public static void callGetNameById() throws Exception{
+    public static void callGetNameById() throws Exception{
           Connection con = dbConnction();
           int id=4;
            CallableStatement cs =con.prepareCall("{call GetNameByID(?,?)}");
@@ -112,5 +112,26 @@ public class StudentManagmentSystem {
            cs.executeUpdate();
          
            System.out.println(cs.getString(2));
+    }
+    
+    public static void commitPractice() throws Exception {
+          Connection con = dbConnction();
+          String query ="UPDATE student SET performance= 50 WHERE student_id=1";
+          String query2 ="UPDATE student SET performance= 50 WHERE student_id=2";
+          con.setAutoCommit(false);
+          
+          Statement st= con.createStatement();
+          int a=st.executeUpdate(query);
+          int b=st.executeUpdate(query2);
+          
+          if(a>0 && b>0){
+              con.commit();
+          }
+          
+          
+          System.out.println(a);
+          System.out.println(b);
+          con.close();
+          
     }
 }
