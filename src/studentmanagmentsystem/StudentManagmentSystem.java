@@ -3,24 +3,25 @@ import java.sql.*;
 import java.util.*; 
 
 
-public class StudentManagmentSystem {
-    public static void main(String[] args) throws Exception{
-     batchProcessing();
-    }
+
+
+
+   public class StudentManagmentSystem {
+    private static DbConfig dbconfig= DbConfig.getInstance();
+   
     
-    public static Connection dbConnction() throws Exception{
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        String url= "jdbc:mysql://localhost:3306/devAcademy";
-        String user="root";
-        String password="123456";
-        Connection con=DriverManager.getConnection(url, user, password);
-        return con;
+    public static void main(String[] args) throws Exception{
+       
+        callGetNameById(); 
+     
+        
     }
     
     public static void getAllStudent() throws Exception{
-       
+     
         String sql="SELECT * from student";
-        try (Connection con = dbConnction()) {
+        
+        try (Connection con = dbconfig.dbConnction()) {
             Statement st=con.createStatement();
             ResultSet rs= st.executeQuery(sql);
             
@@ -35,9 +36,10 @@ public class StudentManagmentSystem {
     }
     
     public static void insertStudent() throws Exception {
-    
-
-        String name= "Hasika";
+         System.out.println("Enter Your Name");
+         Scanner scanner = new Scanner(System.in);
+        String name= scanner.nextLine();
+        
         int age =21;
         String department="Engineering";
         String district="Batticaloa";
@@ -47,9 +49,10 @@ public class StudentManagmentSystem {
         
         String sql="INSERT INTO student (name,age,department,district,nic,gender,performance)"
                 + " VALUES (?,?,?,?,?,?,?)";
-        try (Connection con = dbConnction()) {
+        try (Connection con = dbconfig.dbConnction()) {
             
             PreparedStatement ps=con.prepareStatement(sql);
+            
                 ps.setString(1, name);
                 ps.setInt(2, age);
                 ps.setString(3, department);
@@ -66,9 +69,10 @@ public class StudentManagmentSystem {
     }
     
     public static void deleteStudent() throws Exception{
-            Connection con = dbConnction();
-            int id=6;
-            String sql="DELETE from student WHERE student_id= ? ";
+            
+            Connection con = dbconfig.dbConnction();
+            int id=1;
+            String sql="DELETE from student WHERE id= ? ";
             
             PreparedStatement st=con.prepareStatement(sql);
             st.setInt(1, id);
@@ -76,8 +80,10 @@ public class StudentManagmentSystem {
             System.out.println(row); 
     }
     
+    
     public static void callGetAllStudent() throws Exception{
-        Connection con = dbConnction();
+              
+        Connection con = dbconfig.dbConnction();
         //Statement
         //PreparedStatement
         //CallableStatement
@@ -96,8 +102,10 @@ public class StudentManagmentSystem {
     }
     
     public static void callGetById() throws Exception{
-          Connection con = dbConnction();
-          int id=4;
+               
+          Connection con = dbconfig.dbConnction();
+          int id=2;
+          
            CallableStatement cs =con.prepareCall("{call GetByID(?)}");
            cs.setInt(1, id);
            ResultSet rs=cs.executeQuery();
@@ -106,8 +114,9 @@ public class StudentManagmentSystem {
     }
     
     public static void callGetNameById() throws Exception{
-          Connection con = dbConnction();
-          int id=4;
+               
+          Connection con = dbconfig.dbConnction();
+          int id=2;
            CallableStatement cs =con.prepareCall("{call GetNameByID(?,?)}");
            cs.setInt(1, id);
            cs.registerOutParameter(2,Types.VARCHAR);
@@ -117,9 +126,10 @@ public class StudentManagmentSystem {
     }
     
     public static void commitPractice() throws Exception {
-          Connection con = dbConnction();
-          String query ="UPDATE student SET performance= 50 WHERE student_id=1";
-          String query2 ="UPDATE student SET performance= 50 WHERE student_id=2";
+              
+          Connection con = dbconfig.dbConnction();
+          String query ="UPDATE student SET performance= 50 WHERE id=2";
+          String query2 ="UPDATE student SET performance= 50 WHERE id=3";
           con.setAutoCommit(false);
           
           Statement st= con.createStatement();
@@ -138,9 +148,11 @@ public class StudentManagmentSystem {
     }
     
     public static void batchProcessing() throws Exception{
-       Connection con = dbConnction();
-          String query ="UPDATE student SET performance= 75 WHERE student_id=1";
-          String query2 ="UPDATE student SET performance= 75 WHERE student_id=2";
+               
+       Connection con = dbconfig.dbConnction();
+          String query ="UPDATE student SET performance= 10 WHERE id=2";
+          String query2 ="UPDATE student SET performance= 85 WHERE id=3";
+         
          
           Statement st= con.createStatement();
           st.addBatch(query);
@@ -150,5 +162,33 @@ public class StudentManagmentSystem {
          System.out.println(Arrays.toString(a));
           
           
+    }
+    
+    public static void rollBackPractice() throws Exception{
+               
+          Connection con = dbconfig.dbConnction();
+          String query ="UPDATE student SET performance= 88 WHERE student_id=3";
+          String query2 ="UPDAT student SET performance= 78 WHERE student_id=2";
+          Statement st= con.createStatement();
+          con.setAutoCommit(false);
+          
+          st.addBatch(query);
+          st.addBatch(query2);
+         int[] a= st.executeBatch();
+         
+         for(int i :a){
+             
+             if(i>0){
+                 continue;
+             }
+             else{
+                 con.rollback();
+             }
+             
+         }
+         
+         con.commit();
+         
+         
     }
 }
